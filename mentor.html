@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor Sign-Up — Foothill DECA Shark Tank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="mentor">
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack">LOADING LIVE STATS…</div></div>
+
+<header class="top">
+  <div class="brand">
+    <div>
+      <h1>🦈 Foothill DECA — Shark Tank Challenge</h1>
+      <div class="tag">An entrepreneurship intro event for middle schoolers &amp; incoming freshmen</div>
+    </div>
+    <span class="pill gold">OCT 5–7</span>
+  </div>
+  <nav class="tabs">
+    <a href="index.html" data-page="overview">Overview</a>
+    <a href="register.html" data-page="register">Student Sign-Up</a>
+    <a href="mentor.html" data-page="mentor">Mentor Sign-Up</a>
+    <a href="judge.html" data-page="judge">Judge Sign-Up</a>
+    <a href="schedule.html" data-page="schedule">Schedule</a>
+    <a href="officer.html" data-page="officer">Officer Portal</a>
+  </nav>
+</header>
+
+<main>
+  <div class="view">
+    <div class="card">
+      <span class="eyebrow">Mentor sign-up — Foothill DECA members only</span>
+      <h2 style="font-size:26px; margin:6px 0 4px;">Apply to mentor</h2>
+      <p style="color:var(--ink-soft); font-size:14px; margin:0 0 6px;">Open to Foothill DECA members who've qualified to ICDC (any prepared event or entrepreneurship roleplay preferred).</p>
+      <p style="color:var(--ink-soft); font-size:14px; margin:0 0 20px;">Mentors teach one of the four online workshop topics on Day 1, or coach a team on business concept development / pitch deck creation in person on Day 2.</p>
+      <div id="formBanner"></div>
+      <form id="mentorForm">
+        <div class="two-col">
+          <div class="field">
+            <label for="m_name">Full name</label>
+            <input type="text" id="m_name" required placeholder="Full name">
+          </div>
+          <div class="field">
+            <label for="m_email">Email</label>
+            <input type="email" id="m_email" required placeholder="you@email.com">
+          </div>
+          <div class="field">
+            <label for="m_grade">Grade</label>
+            <select id="m_grade" required>
+              <option value="">Select grade</option>
+              <option>9th</option><option>10th</option><option>11th</option><option>12th</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="m_icdc">ICDC qualification (event &amp; year)</label>
+            <input type="text" id="m_icdc" required placeholder="e.g. Entrepreneurship Roleplay, 2025">
+          </div>
+        </div>
+        <div class="field">
+          <label for="m_pref1">1st choice — what would you like to teach/coach?</label>
+          <select id="m_pref1" required>
+            <option value="">Select a topic</option>
+            <option>What is Entrepreneurship? (Online Workshop)</option>
+            <option>Introduction to Lean Canvas &amp; Value Proposition (Online Workshop)</option>
+            <option>Building an MVP and Testing Ideas (Online Workshop)</option>
+            <option>How to Create an Effective Pitch Deck (Online Workshop)</option>
+            <option>Business Concept Development (Day 2, in-person)</option>
+            <option>Pitch Deck Creation (Day 2, in-person)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="m_pref2">2nd choice</label>
+          <select id="m_pref2" required>
+            <option value="">Select a topic</option>
+            <option>What is Entrepreneurship? (Online Workshop)</option>
+            <option>Introduction to Lean Canvas &amp; Value Proposition (Online Workshop)</option>
+            <option>Building an MVP and Testing Ideas (Online Workshop)</option>
+            <option>How to Create an Effective Pitch Deck (Online Workshop)</option>
+            <option>Business Concept Development (Day 2, in-person)</option>
+            <option>Pitch Deck Creation (Day 2, in-person)</option>
+          </select>
+        </div>
+        <button type="submit" class="primary" id="m_submit">Submit mentor application</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>FOOTHILL DECA · SHARK TANK CHALLENGE · questions → foothilldeca@gmail.com</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.getElementById('mentorForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('m_submit');
+  const banner = document.getElementById('formBanner');
+  const p1 = document.getElementById('m_pref1').value;
+  const p2 = document.getElementById('m_pref2').value;
+  if (p1 && p1 === p2) {
+    banner.innerHTML = '<div class="banner err">Your 1st and 2nd choice can\'t be the same topic.</div>';
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const data = {
+    name: document.getElementById('m_name').value.trim(),
+    email: document.getElementById('m_email').value.trim(),
+    grade: document.getElementById('m_grade').value,
+    icdc: document.getElementById('m_icdc').value.trim(),
+    pref1: p1,
+    pref2: p2,
+    assignedRole: ''
+  };
+  try {
+    await Data.add('mentors', data);
+    banner.innerHTML = '<div class="banner ok">Application received — you\'ll hear back once mentor roles are finalized.</div>';
+    e.target.reset();
+    refreshTicker();
+  } catch (err) {
+    console.error(err);
+    banner.innerHTML = '<div class="banner err">Something went wrong — check your connection and try again.</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit mentor application';
+  }
+});
+</script>
+</body>
+</html>

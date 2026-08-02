@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Judge Sign-Up — Foothill DECA Shark Tank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="judge">
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack">LOADING LIVE STATS…</div></div>
+
+<header class="top">
+  <div class="brand">
+    <div>
+      <h1>🦈 Foothill DECA — Shark Tank Challenge</h1>
+      <div class="tag">An entrepreneurship intro event for middle schoolers &amp; incoming freshmen</div>
+    </div>
+    <span class="pill gold">OCT 5–7</span>
+  </div>
+  <nav class="tabs">
+    <a href="index.html" data-page="overview">Overview</a>
+    <a href="register.html" data-page="register">Student Sign-Up</a>
+    <a href="mentor.html" data-page="mentor">Mentor Sign-Up</a>
+    <a href="judge.html" data-page="judge">Judge Sign-Up</a>
+    <a href="schedule.html" data-page="schedule">Schedule</a>
+    <a href="officer.html" data-page="officer">Officer Portal</a>
+  </nav>
+</header>
+
+<main>
+  <div class="view">
+    <div class="card">
+      <span class="eyebrow">Judge sign-up</span>
+      <h2 style="font-size:26px; margin:6px 0 4px;">Join the panel</h2>
+      <p style="color:var(--ink-soft); font-size:14px; margin:0 0 20px;">We're looking for 5–6 professionals to score final pitches on Day 3, Thursday, October 7. A judging rubric and packet will be sent ahead of time.</p>
+      <div id="formBanner"></div>
+      <form id="judgeForm">
+        <div class="two-col">
+          <div class="field">
+            <label for="j_name">Full name</label>
+            <input type="text" id="j_name" required placeholder="Full name">
+          </div>
+          <div class="field">
+            <label for="j_email">Email</label>
+            <input type="email" id="j_email" required placeholder="you@email.com">
+          </div>
+        </div>
+        <div class="field">
+          <label for="j_industry">Industry / job information</label>
+          <textarea id="j_industry" rows="3" required placeholder="e.g. Product Manager at a fintech startup; 8 years in venture-backed companies"></textarea>
+        </div>
+        <div class="field checkbox-row">
+          <input type="checkbox" id="j_confirm" required>
+          <label for="j_confirm" style="margin:0; text-transform:none; letter-spacing:0; font-family:'Inter',sans-serif; font-weight:400; font-size:14px;">
+            I can attend Day 3 (Thu, Oct 7). If anything changes, I'll email foothilldeca@gmail.com.
+          </label>
+        </div>
+        <button type="submit" class="primary" id="j_submit">Submit judge sign-up</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>FOOTHILL DECA · SHARK TANK CHALLENGE · questions → foothilldeca@gmail.com</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.getElementById('judgeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('j_submit');
+  const banner = document.getElementById('formBanner');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const data = {
+    name: document.getElementById('j_name').value.trim(),
+    email: document.getElementById('j_email').value.trim(),
+    industry: document.getElementById('j_industry').value.trim(),
+    confirmed: document.getElementById('j_confirm').checked
+  };
+  try {
+    await Data.add('judges', data);
+    banner.innerHTML = '<div class="banner ok">Thanks for joining the panel — a judging rubric and packet will be sent ahead of Day 3.</div>';
+    e.target.reset();
+    refreshTicker();
+  } catch (err) {
+    console.error(err);
+    banner.innerHTML = '<div class="banner err">Something went wrong — check your connection and try again.</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit judge sign-up';
+  }
+});
+</script>
+</body>
+</html>

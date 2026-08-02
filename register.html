@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Sign-Up — Foothill DECA Shark Tank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="register">
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack">LOADING LIVE STATS…</div></div>
+
+<header class="top">
+  <div class="brand">
+    <div>
+      <h1>🦈 Foothill DECA — Shark Tank Challenge</h1>
+      <div class="tag">An entrepreneurship intro event for middle schoolers &amp; incoming freshmen</div>
+    </div>
+    <span class="pill gold">OCT 5–7</span>
+  </div>
+  <nav class="tabs">
+    <a href="index.html" data-page="overview">Overview</a>
+    <a href="register.html" data-page="register">Student Sign-Up</a>
+    <a href="mentor.html" data-page="mentor">Mentor Sign-Up</a>
+    <a href="judge.html" data-page="judge">Judge Sign-Up</a>
+    <a href="schedule.html" data-page="schedule">Schedule</a>
+    <a href="officer.html" data-page="officer">Officer Portal</a>
+  </nav>
+</header>
+
+<main>
+  <div class="view">
+    <div class="card">
+      <span class="eyebrow">Student sign-up</span>
+      <h2 style="font-size:26px; margin:6px 0 4px;">Register for the Shark Tank Challenge</h2>
+      <p style="color:var(--ink-soft); font-size:14px; margin:0 0 20px;">Takes about two minutes. A confirmation email and your team assignment will follow closer to the event.</p>
+      <div id="formBanner"></div>
+      <form id="studentForm">
+        <div class="two-col">
+          <div class="field">
+            <label for="s_name">Student name</label>
+            <input type="text" id="s_name" required placeholder="Jordan Lee">
+          </div>
+          <div class="field">
+            <label for="s_email">Student email</label>
+            <input type="email" id="s_email" required placeholder="jordan@email.com">
+          </div>
+          <div class="field">
+            <label for="s_school">School</label>
+            <input type="text" id="s_school" required placeholder="e.g. Fern Springs Middle School">
+          </div>
+          <div class="field">
+            <label for="s_grade">Grade</label>
+            <select id="s_grade" required>
+              <option value="">Select grade</option>
+              <option>6th</option><option>7th</option><option>8th</option><option>9th (Freshman)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="s_allergies">Allergies (for snacks)</label>
+            <input type="text" id="s_allergies" placeholder="None, or list allergies">
+          </div>
+          <div class="field"></div>
+          <div class="field">
+            <label for="p_name">Parent/guardian name</label>
+            <input type="text" id="p_name" required placeholder="Parent full name">
+          </div>
+          <div class="field">
+            <label for="p_email">Parent/guardian email</label>
+            <input type="email" id="p_email" required placeholder="parent@email.com">
+          </div>
+          <div class="field">
+            <label for="p_phone">Parent/guardian phone</label>
+            <input type="tel" id="p_phone" required placeholder="(925) 555-0123">
+          </div>
+        </div>
+        <button type="submit" class="primary" id="s_submit">Submit registration</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>FOOTHILL DECA · SHARK TANK CHALLENGE · questions → foothilldeca@gmail.com</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.getElementById('studentForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('s_submit');
+  const banner = document.getElementById('formBanner');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const data = {
+    name: document.getElementById('s_name').value.trim(),
+    email: document.getElementById('s_email').value.trim(),
+    school: document.getElementById('s_school').value.trim(),
+    grade: document.getElementById('s_grade').value,
+    allergies: document.getElementById('s_allergies').value.trim() || 'None listed',
+    parentName: document.getElementById('p_name').value.trim(),
+    parentEmail: document.getElementById('p_email').value.trim(),
+    parentPhone: document.getElementById('p_phone').value.trim(),
+    team: ''
+  };
+  try {
+    await Data.add('students', data);
+    banner.innerHTML = '<div class="banner ok">You\'re registered! A confirmation and team assignment will follow by email closer to the event.</div>';
+    e.target.reset();
+    refreshTicker();
+  } catch (err) {
+    console.error(err);
+    banner.innerHTML = '<div class="banner err">Something went wrong saving your registration — check your connection and try again.</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit registration';
+  }
+});
+</script>
+</body>
+</html>

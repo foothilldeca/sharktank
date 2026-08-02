@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Officer Portal — Foothill DECA Shark Tank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="officer">
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack">LOADING LIVE STATS…</div></div>
+
+<header class="top">
+  <div class="brand">
+    <div>
+      <h1>🦈 Foothill DECA — Shark Tank Challenge</h1>
+      <div class="tag">An entrepreneurship intro event for middle schoolers &amp; incoming freshmen</div>
+    </div>
+    <span class="pill gold">OCT 5–7</span>
+  </div>
+  <nav class="tabs">
+    <a href="index.html" data-page="overview">Overview</a>
+    <a href="register.html" data-page="register">Student Sign-Up</a>
+    <a href="mentor.html" data-page="mentor">Mentor Sign-Up</a>
+    <a href="judge.html" data-page="judge">Judge Sign-Up</a>
+    <a href="schedule.html" data-page="schedule">Schedule</a>
+    <a href="officer.html" data-page="officer">Officer Portal</a>
+  </nav>
+</header>
+
+<main>
+  <div class="view">
+    <div id="officerLock" class="lock-screen">
+      <div class="card">
+        <span class="eyebrow">Officers only</span>
+        <h2 style="font-size:22px; margin:8px 0 6px;">Enter access code</h2>
+        <p style="font-size:13px; color:var(--ink-soft); margin:0 0 16px;">Ask your EVP or Project Manager for the current code. This is a soft gate to keep casual visitors out — not real security, so don't put anything highly sensitive here. (See README.md for how to actually restrict database access.)</p>
+        <input type="text" id="officerCode" placeholder="Access code" style="width:100%; padding:10px 12px; border:2px solid var(--ink); border-radius:6px; font-family:'IBM Plex Mono',monospace; margin-bottom:12px;">
+        <button class="primary" style="width:100%;" onclick="tryOfficerLogin()">Unlock officer portal</button>
+        <div id="officerLoginErr" style="color:var(--red); font-size:12.5px; margin-top:10px; font-family:'IBM Plex Mono',monospace;"></div>
+      </div>
+    </div>
+
+    <div id="officerDash" style="display:none;">
+      <div class="card" style="margin-bottom:20px;">
+        <span class="eyebrow">Officer portal</span>
+        <h2 style="font-size:24px; margin:6px 0 14px;">Registration dashboard</h2>
+        <div class="stat-strip" id="officerStatStrip">
+          <div class="stat"><div class="n">—</div><div class="l">Students</div></div>
+          <div class="stat"><div class="n">—</div><div class="l">Mentors</div></div>
+          <div class="stat"><div class="n">—</div><div class="l">Judges</div></div>
+          <div class="stat"><div class="n">—</div><div class="l">Judges confirmed</div></div>
+        </div>
+        <p style="font-size:12px; color:var(--ink-soft); margin:0;">Data is shared across everyone who opens this portal, and updates live. Assign teams and remove test entries below.</p>
+      </div>
+
+      <section class="block" style="margin-top:0;">
+        <h3>Students <span id="studentCountLabel" class="pill green" style="margin-left:6px;">0</span></h3>
+        <div class="toolbar">
+          <input type="text" id="studentSearch" placeholder="Search by name or school…">
+          <button class="btn small" onclick="exportCSV('student')">Export CSV</button>
+          <button class="btn small ghost" onclick="loadAll()">Refresh</button>
+        </div>
+        <div class="table-wrap"><div id="studentTable"></div></div>
+      </section>
+
+      <section class="block">
+        <h3>Mentors <span id="mentorCountLabel" class="pill green" style="margin-left:6px;">0</span></h3>
+        <div class="toolbar">
+          <input type="text" id="mentorSearch" placeholder="Search by name…">
+          <button class="btn small" onclick="exportCSV('mentor')">Export CSV</button>
+        </div>
+        <div class="table-wrap"><div id="mentorTable"></div></div>
+      </section>
+
+      <section class="block">
+        <h3>Judges <span id="judgeCountLabel" class="pill green" style="margin-left:6px;">0</span></h3>
+        <div class="toolbar">
+          <input type="text" id="judgeSearch" placeholder="Search by name…">
+          <button class="btn small" onclick="exportCSV('judge')">Export CSV</button>
+        </div>
+        <div class="table-wrap"><div id="judgeTable"></div></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>FOOTHILL DECA · SHARK TANK CHALLENGE · questions → foothilldeca@gmail.com</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+/* Change this to whatever code your officer team wants to use. */
+const OFFICER_CODE = "FOOTHILLDECA26";
+
+function tryOfficerLogin() {
+  const val = document.getElementById('officerCode').value.trim();
+  if (val === OFFICER_CODE) {
+    document.getElementById('officerLock').style.display = 'none';
+    document.getElementById('officerDash').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('officerLoginErr').textContent = 'Incorrect code — check with your officer team.';
+  }
+}
+document.getElementById('officerCode').addEventListener('keydown', e => { if (e.key === 'Enter') tryOfficerLogin(); });
+
+let cache = { student: [], mentor: [], judge: [] };
+
+async function loadAll() {
+  cache.student = await Data.list('students');
+  cache.mentor = await Data.list('mentors');
+  cache.judge = await Data.list('judges');
+  renderStudentTable();
+  renderMentorTable();
+  renderJudgeTable();
+  renderOfficerStats();
+  refreshTicker();
+}
+
+function renderOfficerStats() {
+  const confirmedJudges = cache.judge.filter(j => j.confirmed).length;
+  document.getElementById('officerStatStrip').innerHTML = `
+    <div class="stat"><div class="n">${cache.student.length}</div><div class="l">Students</div></div>
+    <div class="stat"><div class="n">${cache.mentor.length}</div><div class="l">Mentors</div></div>
+    <div class="stat"><div class="n">${cache.judge.length}</div><div class="l">Judges</div></div>
+    <div class="stat"><div class="n">${confirmedJudges}</div><div class="l">Judges confirmed</div></div>
+  `;
+  document.getElementById('studentCountLabel').textContent = cache.student.length;
+  document.getElementById('mentorCountLabel').textContent = cache.mentor.length;
+  document.getElementById('judgeCountLabel').textContent = cache.judge.length;
+}
+
+function renderStudentTable(filter = '') {
+  const q = filter.toLowerCase();
+  const rows = cache.student.filter(r => !q || r.name.toLowerCase().includes(q) || r.school.toLowerCase().includes(q));
+  const el = document.getElementById('studentTable');
+  if (rows.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="big">No students yet</div>Share the Student Sign-Up page to start collecting registrations.</div>`;
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr><th>Name</th><th>School</th><th>Grade</th><th>Team</th><th>Parent</th><th>Parent contact</th><th>Allergies</th><th></th></tr></thead>
+    <tbody>${rows.map(r => `
+      <tr>
+        <td><strong>${esc(r.name)}</strong><br><span style="color:var(--ink-soft); font-size:12px;">${esc(r.email)}</span></td>
+        <td>${esc(r.school)}</td>
+        <td>${esc(r.grade)}</td>
+        <td><input class="team-input" value="${esc(r.team || '')}" placeholder="e.g. T-3" onchange="assignTeam('${r.id}', this.value)"></td>
+        <td>${esc(r.parentName)}</td>
+        <td>${esc(r.parentEmail)}<br>${esc(r.parentPhone)}</td>
+        <td>${esc(r.allergies)}</td>
+        <td><button class="btn small danger" onclick="removeRecord('students','${r.id}')">Remove</button></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+function renderMentorTable(filter = '') {
+  const q = filter.toLowerCase();
+  const rows = cache.mentor.filter(r => !q || r.name.toLowerCase().includes(q));
+  const el = document.getElementById('mentorTable');
+  if (rows.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="big">No mentors yet</div>Share the Mentor Sign-Up page with qualified DECA members.</div>`;
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr><th>Name</th><th>Grade</th><th>ICDC qualification</th><th>1st choice</th><th>2nd choice</th><th></th></tr></thead>
+    <tbody>${rows.map(r => `
+      <tr>
+        <td><strong>${esc(r.name)}</strong><br><span style="color:var(--ink-soft); font-size:12px;">${esc(r.email)}</span></td>
+        <td>${esc(r.grade)}</td>
+        <td>${esc(r.icdc)}</td>
+        <td>${esc(r.pref1)}</td>
+        <td>${esc(r.pref2)}</td>
+        <td><button class="btn small danger" onclick="removeRecord('mentors','${r.id}')">Remove</button></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+function renderJudgeTable(filter = '') {
+  const q = filter.toLowerCase();
+  const rows = cache.judge.filter(r => !q || r.name.toLowerCase().includes(q));
+  const el = document.getElementById('judgeTable');
+  if (rows.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="big">No judges yet</div>Aim for 5–6 on the panel for Day 3.</div>`;
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr><th>Name</th><th>Industry / role</th><th>Confirmed for Day 3</th><th></th></tr></thead>
+    <tbody>${rows.map(r => `
+      <tr>
+        <td><strong>${esc(r.name)}</strong><br><span style="color:var(--ink-soft); font-size:12px;">${esc(r.email)}</span></td>
+        <td>${esc(r.industry)}</td>
+        <td>${r.confirmed ? '<span class="pill green">Confirmed</span>' : '<span class="pill gold">Pending</span>'}</td>
+        <td><button class="btn small danger" onclick="removeRecord('judges','${r.id}')">Remove</button></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+async function assignTeam(id, value) {
+  const rec = cache.student.find(r => r.id === id);
+  if (!rec) return;
+  rec.team = value;
+  try { await Data.update('students', id, { team: value }); }
+  catch (e) { alert('Could not save team assignment — try again.'); }
+}
+
+async function removeRecord(coll, id) {
+  if (!confirm('Remove this entry? This can\'t be undone.')) return;
+  try {
+    await Data.remove(coll, id);
+    await loadAll();
+  } catch (e) {
+    alert('Could not remove this entry — try again.');
+  }
+}
+
+document.getElementById('studentSearch').addEventListener('input', e => renderStudentTable(e.target.value));
+document.getElementById('mentorSearch').addEventListener('input', e => renderMentorTable(e.target.value));
+document.getElementById('judgeSearch').addEventListener('input', e => renderJudgeTable(e.target.value));
+
+function exportCSV(type) {
+  let rows, headers, filename;
+  if (type === 'student') {
+    rows = cache.student;
+    headers = [
+      { label: 'Name', get: d => d.name }, { label: 'Email', get: d => d.email }, { label: 'School', get: d => d.school },
+      { label: 'Grade', get: d => d.grade }, { label: 'Team', get: d => d.team }, { label: 'Allergies', get: d => d.allergies },
+      { label: 'Parent Name', get: d => d.parentName }, { label: 'Parent Email', get: d => d.parentEmail }, { label: 'Parent Phone', get: d => d.parentPhone }
+    ];
+    filename = 'shark-tank-students.csv';
+  } else if (type === 'mentor') {
+    rows = cache.mentor;
+    headers = [
+      { label: 'Name', get: d => d.name }, { label: 'Email', get: d => d.email }, { label: 'Grade', get: d => d.grade },
+      { label: 'ICDC Qualification', get: d => d.icdc }, { label: '1st Choice', get: d => d.pref1 }, { label: '2nd Choice', get: d => d.pref2 }
+    ];
+    filename = 'shark-tank-mentors.csv';
+  } else {
+    rows = cache.judge;
+    headers = [
+      { label: 'Name', get: d => d.name }, { label: 'Email', get: d => d.email },
+      { label: 'Industry', get: d => d.industry }, { label: 'Confirmed', get: d => d.confirmed ? 'Yes' : 'No' }
+    ];
+    filename = 'shark-tank-judges.csv';
+  }
+  if (rows.length === 0) { alert('Nothing to export yet.'); return; }
+  downloadCSV(filename, toCSV(rows, headers));
+}
+</script>
+</body>
+</html>

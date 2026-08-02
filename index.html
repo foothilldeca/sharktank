@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foothill DECA — Shark Tank Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="overview">
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack">LOADING LIVE STATS…</div></div>
+
+<header class="top">
+  <div class="brand">
+    <div>
+      <h1>🦈 Foothill DECA — Shark Tank Challenge</h1>
+      <div class="tag">An entrepreneurship intro event for middle schoolers &amp; incoming freshmen</div>
+    </div>
+    <span class="pill gold">OCT 5–7</span>
+  </div>
+  <nav class="tabs">
+    <a href="index.html" data-page="overview">Overview</a>
+    <a href="register.html" data-page="register">Student Sign-Up</a>
+    <a href="mentor.html" data-page="mentor">Mentor Sign-Up</a>
+    <a href="judge.html" data-page="judge">Judge Sign-Up</a>
+    <a href="schedule.html" data-page="schedule">Schedule</a>
+    <a href="officer.html" data-page="officer">Officer Portal</a>
+  </nav>
+</header>
+
+<main>
+  <div class="view">
+    <div class="card hero">
+      <span class="eyebrow">Foothill DECA presents</span>
+      <h2>Pitch it.<br>Build it.<br><em>Own it.</em></h2>
+      <p class="sub">A three-day crash course in entrepreneurship — spot a real problem, sketch a business model, build a pitch deck with a mentor, and defend it in front of a panel of judges, Shark-Tank style.</p>
+      <div class="stat-strip" id="statStrip">
+        <div class="stat"><div class="n">—</div><div class="l">Students In</div></div>
+        <div class="stat"><div class="n">—</div><div class="l">Mentors In</div></div>
+        <div class="stat"><div class="n">—</div><div class="l">Judges In</div></div>
+        <div class="stat"><div class="n">—</div><div class="l">Days to Day 1</div></div>
+      </div>
+      <a class="btn" href="register.html">Register a student →</a>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="font-size:19px; margin-bottom:12px;">What this event is</h3>
+        <p style="font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 14px;">
+          Participants attend a short online workshop, then spend two in-person afternoons learning startup fundamentals — identifying opportunities, the Lean Canvas, MVPs, and pitch decks — before teaming up to build and present an original business concept to a live panel of judges.
+        </p>
+        <p style="font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin:0;">
+          It's designed to build creativity, problem-solving, and public speaking skills, and to introduce entrepreneurship as a path — no prior DECA or business experience required.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:19px; margin-bottom:12px;">Term sheet</h3>
+        <ul class="term-list">
+          <li><span class="k">Early bird fee</span><span class="v">$59</span></li>
+          <li><span class="k">Regular fee</span><span class="v">$75</span></li>
+          <li><span class="k">Day 1 — Online workshop</span><span class="v">Tue, Oct 5</span></li>
+          <li><span class="k">Day 2 — Keynote + pitch build</span><span class="v">Wed, Oct 6</span></li>
+          <li><span class="k">Day 3 — Panel presentations</span><span class="v">Thu, Oct 7</span></li>
+          <li><span class="k">Keynote speaker</span><span class="v">Reena Gupta, Entrepreneur</span></li>
+          <li><span class="k">Location</span><span class="v">Foothill HS — MPR &amp; Library</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <section class="block">
+      <h3>Three ways in</h3>
+      <div class="grid-2" style="grid-template-columns:repeat(3,1fr);">
+        <div class="card">
+          <span class="pill green">Student</span>
+          <h4 style="font-family:'Fraunces',serif; margin:10px 0 6px;">Join a team</h4>
+          <p style="font-size:13.5px; color:var(--ink-soft); margin:0 0 12px;">Register, get placed on a team, and pitch on Day 3.</p>
+          <a class="btn small" href="register.html">Sign up</a>
+        </div>
+        <div class="card">
+          <span class="pill green">Mentor</span>
+          <h4 style="font-family:'Fraunces',serif; margin:10px 0 6px;">Teach &amp; coach</h4>
+          <p style="font-size:13.5px; color:var(--ink-soft); margin:0 0 12px;">Foothill DECA members who've qualified to ICDC — teach a workshop or coach a team.</p>
+          <a class="btn small" href="mentor.html">Apply to mentor</a>
+        </div>
+        <div class="card">
+          <span class="pill green">Judge</span>
+          <h4 style="font-family:'Fraunces',serif; margin:10px 0 6px;">Judge the pitches</h4>
+          <p style="font-size:13.5px; color:var(--ink-soft); margin:0 0 12px;">Industry professionals — join the panel for Day 3.</p>
+          <a class="btn small" href="judge.html">Sign up to judge</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>FOOTHILL DECA · SHARK TANK CHALLENGE · questions → foothilldeca@gmail.com</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
